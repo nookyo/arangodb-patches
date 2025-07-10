@@ -46,7 +46,7 @@ RUN mkdir /opt/arangodb/build && cd /opt/arangodb/build && \
 ################################################################
 FROM alpine:3.21
 
-LABEL maintainer="Frank Celler <info@arangodb.com>"
+LABEL maintainer="Qubership <bot@qubership.com>"
 
 ARG TAG
 ENV ARANGO_VERSION=${TAG} \
