@@ -24,6 +24,7 @@ jobs:
         run: |
           ls -la
           ls -la alpine
+          ls -la alpine/3.11.14
 
       - name: Build & Publish ArangoDB Image
         uses: netcracker/qubership-workflow-hub/actions/docker-action@main
