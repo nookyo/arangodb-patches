@@ -24,7 +24,7 @@ RUN git clone --branch ${TAG} --depth 1 --recurse-submodules \
 
 
 # 2.1) Копируем патчи из контекста сборки в контейнер
-COPY ${PATCHES_PATH}/*.patch /opt/arangodb/src/patches/
+COPY patches/*.patch /opt/arangodb/src/patches/
 
 # 2.2) Применяем все патчи
 RUN cd /opt/arangodb/src && \
