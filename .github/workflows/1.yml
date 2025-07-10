@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build & Push Image
-        uses: ./.github/actions/docker-build-and-publish
+        uses: ./netcracker/qubership-workflow-hub/tree/main/actions/docker-action@main
         with:
           ref: ${{ github.ref }}
           custom-image-name: arangodb-source
