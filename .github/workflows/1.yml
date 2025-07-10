@@ -22,7 +22,6 @@ jobs:
           ref: ${{ github.ref }}
           custom-image-name: arangodb-source
           context: .
-          file: Dockerfile
           platforms: linux/amd64,linux/arm64
           tags: "${{ github.event.inputs.tag }}"
           build-args: |
