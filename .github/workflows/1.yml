@@ -1,4 +1,5 @@
-name: Build Docker file
+name: Build and Publish ArangoDB Docker Image
+
 on:
   workflow_dispatch:
     inputs:
@@ -6,25 +7,28 @@ on:
         description: "Tag for the Docker image"
         required: true
         default: ""
+      custom-image-name:
+        description: "Custom name for the Docker image"
+        required: true
+        default: "arangodb-source"
 
 jobs:
   docker:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build & Push Image
+      - name: Build & Publish ArangoDB Image
         uses: netcracker/qubership-workflow-hub/actions/docker-action@main
         with:
           ref: ${{ github.ref }}
           component: '[{"name": "default", "file": "./alpine/3.11.14/Dockerfile", "context": "."}]'
-          custom-image-name: arangodb-source
-
-          tags: "${{ github.event.inputs.tag }}"
+          custom-image-name: ${{ inputs.custom-image-name }}
+          tags: "${{ inputs.tag }}"
           build-args: |
-            TAG=${{ github.event.inputs.tag }}
+            TAG=${{ inputs.tag }}
           dry-run: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
