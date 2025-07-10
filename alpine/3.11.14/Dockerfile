@@ -4,6 +4,7 @@
 ARG TAG=v3.11.14
 FROM debian:12 AS builder
 ARG TAG
+ARG PATCHES_PATH=patches
 
 # 1) Установим инструменты для сборки
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -23,7 +24,7 @@ RUN git clone --branch ${TAG} --depth 1 --recurse-submodules \
 
 
 # 2.1) Копируем патчи из контекста сборки в контейнер
-COPY patches/*.patch /opt/arangodb/src/patches/
+COPY ${PATCHES_PATH}/*.patch /opt/arangodb/src/patches/
 
 # 2.2) Применяем все патчи
 RUN cd /opt/arangodb/src && \
