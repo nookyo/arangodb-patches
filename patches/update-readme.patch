@@ -1,7 +1,7 @@
-diff --git a/README.md b/README.md
+diff --git README.md README.md
 index 1a2b3c4..5d6e7f8 100644
---- a/README.md
-+++ b/README.md
+--- README.md
++++ README.md
 @@ -1,4 +1,12 @@
 -# ArangoDB Community Edition
 +# ArangoDB Community Edition
