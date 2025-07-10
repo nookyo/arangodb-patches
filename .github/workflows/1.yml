@@ -1,12 +1,11 @@
 name: Build Docker file
 on:
-   workflow_dispatch:
+  workflow_dispatch:
     inputs:
       tag:
         description: "Tag for the Docker image"
         required: true
         default: ""
-
 
 jobs:
   docker:
@@ -25,3 +24,5 @@ jobs:
           build-args: |
             TAG=${{ github.event.inputs.tag }}
           dry-run: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
