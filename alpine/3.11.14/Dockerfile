@@ -94,8 +94,8 @@ RUN echo "UTC" > /etc/timezone
 VOLUME ["/var/lib/arangodb3", "/var/lib/arangodb3-apps"]
 
 # 7) Копируем официальные entrypoint'ы
-COPY docker-entrypoint.sh /entrypoint.sh
-COPY docker-foxx.sh /usr/bin/foxx
+COPY alpine/3.11.14/docker-entrypoint.sh /entrypoint.sh
+COPY alpine/3.11.14/docker-foxx.sh /usr/bin/foxx
 RUN chmod +x /entrypoint.sh /usr/bin/foxx
 
 EXPOSE 8529
