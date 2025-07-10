@@ -7,6 +7,10 @@ on:
         description: "Tag for the Docker image"
         required: true
         default: ""
+      patches-path:
+        description: "Path to the patches directory"
+        required: true
+        default: "patches"
       custom-image-name:
         description: "Custom name for the Docker image"
         required: true
@@ -29,6 +33,7 @@ jobs:
           tags: "${{ inputs.tag }}"
           build-args: |
             TAG=${{ inputs.tag }}
+            PATCHES_PATH=${{ inputs.patches-path }}
           dry-run: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
