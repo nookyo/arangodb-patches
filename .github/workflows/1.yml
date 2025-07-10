@@ -21,8 +21,6 @@ jobs:
         with:
           ref: ${{ github.ref }}
           custom-image-name: arangodb-source
-          context: .
-          platforms: linux/amd64,linux/arm64
           tags: "${{ github.event.inputs.tag }}"
           build-args: |
             TAG=${{ github.event.inputs.tag }}
