@@ -3,6 +3,7 @@
 ################################################################
 ARG TAG=v3.11.14
 FROM debian:12 AS builder
+ARG TAG
 
 # 1) Установим инструменты для сборки
 RUN apt-get update && apt-get install --no-install-recommends -y \

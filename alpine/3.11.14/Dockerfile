@@ -3,6 +3,7 @@
 ################################################################
 ARG TAG=v3.11.14
 FROM debian:12 AS builder
+ARG TAG
 
 # 1) Установим инструменты для сборки
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -19,6 +20,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 # 2) Клонируем ArangoDB по нужному TAG со всеми сабмодулями
 RUN git clone --branch ${TAG} --depth 1 --recurse-submodules \
       https://github.com/arangodb/arangodb.git /opt/arangodb/src
+
+      
 
 # 3) Собираем и устанавливаем в /opt/arangodb-${TAG}
 RUN mkdir /opt/arangodb/build && cd /opt/arangodb/build && \
