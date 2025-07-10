@@ -6,7 +6,7 @@ index 1a2b3c4..5d6e7f8 100644
 -# ArangoDB Community Edition
 +# ArangoDB Community Edition
 +
-+ArangoDB is a native multi-model NoSQL database for high performance transactions, 
++ArangoDB is a native multi-model NoSQL database for high performance transactions,
 +graph processing, and search.
 +
 +## What's New
