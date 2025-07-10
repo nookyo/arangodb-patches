@@ -1,0 +1,1 @@
+alpine/3.11.14/docker-entrypoint.sh

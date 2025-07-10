@@ -1,0 +1,30 @@
+name: Build Docker file
+on:
+   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag for the Docker image"
+        required: true
+        default: ""
+
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build & Push Image
+        uses: ./.github/actions/docker-build-and-publish
+        with:
+          ref: ${{ github.ref }}
+          custom-image-name: arangodb-source
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64,linux/arm64
+          tags: "${{ github.event.inputs.tag }}"
+          build-args: |
+            TAG=${{ github.event.inputs.tag }}
+          dry-run: false
