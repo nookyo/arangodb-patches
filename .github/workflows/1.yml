@@ -19,7 +19,9 @@ jobs:
         uses: netcracker/qubership-workflow-hub/actions/docker-action@main
         with:
           ref: ${{ github.ref }}
+          component: '[{"name": "default", "file": "./alpine/3.11.14/Dockerfile", "context": "."}]'
           custom-image-name: arangodb-source
+
           tags: "${{ github.event.inputs.tag }}"
           build-args: |
             TAG=${{ github.event.inputs.tag }}

@@ -21,8 +21,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 RUN git clone --branch ${TAG} --depth 1 --recurse-submodules \
       https://github.com/arangodb/arangodb.git /opt/arangodb/src
 
-      
-
 # 3) Собираем и устанавливаем в /opt/arangodb-${TAG}
 RUN mkdir /opt/arangodb/build && cd /opt/arangodb/build && \
     cmake /opt/arangodb/src \
@@ -48,7 +46,7 @@ RUN mkdir /opt/arangodb/build && cd /opt/arangodb/build && \
 ################################################################
 FROM alpine:3.21
 
-LABEL maintainer="Frank Celler <info@arangodb.com>"
+LABEL maintainer="Qubership <bot@qubership.com>"
 
 ARG TAG
 ENV ARANGO_VERSION=${TAG} \
