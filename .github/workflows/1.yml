@@ -23,6 +23,7 @@ jobs:
       - name: Set up Qubership Workflow Hub
         run: |
           ls -la
+          la -la alpine
 
       - name: Build & Publish ArangoDB Image
         uses: netcracker/qubership-workflow-hub/actions/docker-action@main
