@@ -20,12 +20,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Qubership Workflow Hub
-        run: |
-          ls -la
-          ls -la alpine
-          ls -la alpine/3.11.14
-
       - name: Build & Publish ArangoDB Image
         uses: netcracker/qubership-workflow-hub/actions/docker-action@main
         with:
