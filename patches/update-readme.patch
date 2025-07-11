@@ -5,4 +5,6 @@
  ArangoDB is a scalable graph database system to drive value from connected data,
  faster. Native graphs, an integrated search engine, and JSON support, via a
 -single query language. ArangoDB runs on-prem, in the cloud – anywhere.
-+single
++single query language. ArangoDB runs on-prem, in the cloud – anywhere. It is very scalable.
+ 
+ ArangoDB Cloud Service
