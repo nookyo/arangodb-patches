@@ -1,11 +1,11 @@
 ################################################################
 # Stage 1: Build ArangoDB from sources (Debian)
 ################################################################
-ARG TAG=v3.11.14
-FROM debian:12 AS builder
-ARG TAG
 
-# 1) Установим инструменты для сборки
+FROM debian:12 AS builder
+ARG TAG=v3.11.14
+
+# 1) Установим зависимости для сборки ArangoDB
 RUN apt-get update && apt-get install --no-install-recommends -y \
       build-essential cmake \
       clang-16 lld-16 llvm-16 libomp-16-dev \
@@ -71,7 +71,7 @@ RUN apk add --no-cache \
     apk del yarn && \
     mkdir -p /docker-entrypoint-initdb.d
 
-# 2) Копируем собранный артефакт из билд-стадии
+# 2) Копируем собранный артефакт
 COPY --from=builder /opt/arangodb-${TAG} /opt/arangodb-${TAG}
 
 # 3) Делаем arangod доступным в PATH
