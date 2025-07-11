@@ -1,7 +1,1 @@
-diff --git a/README.md b/README.md
-index efd33e9..b6e8a2c 100644
---- a/README.md
-+++ b/README.md
-@@ -1 +1 @@
--ArangoDB is a scalable graph database system to drive value from connected data, faster.
-+ArangoDB is a native multi-model NoSQL database for high performance transactions and graph queries.
+ArangoDB is a native multi-model NoSQL database for high performance transactions and graph queries.
