@@ -1,18 +1,7 @@
-diff --git README.md README.md
-index 1a2b3c4..5d6e7f8 100644
---- README.md
-+++ README.md
-@@ -1,4 +1,12 @@
--# ArangoDB Community Edition
-+# ArangoDB Community Edition
-+
-+ArangoDB is a native multi-model NoSQL database for high performance transactions,
-+graph processing, and search.
-+
-+## What's New
-+- Added comprehensive build and deployment guides.
-+- Updated links to documentation and community resources.
-+
- ## Quick Start
- 
- To install ArangoDB, download the package for your platform from the [download page](https://www.arangodb.com/download-major/).
+diff --git a/README.md b/README.md
+index efd33e9..b6e8a2c 100644
+--- a/README.md
++++ b/README.md
+@@ -1,1 +1,1 @@
+-ArangoDB is a scalable graph database system to drive value from connected data, faster.
++ArangoDB is a native multi-model NoSQL database for high performance transactions and graph queries.
