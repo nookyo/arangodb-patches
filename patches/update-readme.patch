@@ -1,7 +1,8 @@
 --- a/README.md
 +++ b/README.md
-@@ -9,2 +9,2 @@
+@@ -9,5 +9,5 @@
  
--ArangoDB is a scalable graph database system to drive value from connected data,
-+ArangoDB is a truly scalable graph database system to drive value from connected data,
+ ArangoDB is a scalable graph database system to drive value from connected data,
  faster. Native graphs, an integrated search engine, and JSON support, via a
+-single query language. ArangoDB runs on-prem, in the cloud – anywhere.
++single
