@@ -30,7 +30,7 @@ jobs:
         uses: netcracker/qubership-workflow-hub/actions/docker-action@main
         with:
           ref: ${{ github.ref }}
-          component: '[{"name": "default", "file": "./alpine/3.11.14/Dockerfile", "context": "."}]'
+          # component: '[{"name": "default", "file": "./alpine/3.11.14/Dockerfile", "context": "."}]'
           custom-image-name: ${{ inputs.custom-image-name }}
           tags: "${{ inputs.tag }}"
           build-args: |
