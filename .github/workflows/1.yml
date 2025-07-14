@@ -3,6 +3,10 @@ name: Build and Publish ArangoDB Docker Image
 on:
   workflow_dispatch:
     inputs:
+      arango-tag:
+        description: "ArangoDB version tag to build the image"
+        required: true
+        default: "3.11.14"
       tag:
         description: "Tag for the Docker image"
         required: true
@@ -28,7 +32,7 @@ jobs:
           custom-image-name: ${{ inputs.custom-image-name }}
           tags: "${{ inputs.tag }}"
           build-args: |
-            TAG=${{ inputs.tag }}
+            TAG=${{ inputs.arango-tag }}
           dry-run: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
