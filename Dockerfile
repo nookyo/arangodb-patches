@@ -2,8 +2,9 @@
   # Stage 1: Build ArangoDB from sources (Debian)
   ################################################################
 
-  FROM debian:12 AS builder
   ARG TAG=v3.11.14
+  FROM debian:12 AS builder
+  ARG TAG
 
   # 1) Установим зависимости для сборки ArangoDB
   RUN apt-get update && apt-get install --no-install-recommends -y \
