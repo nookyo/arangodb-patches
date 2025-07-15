@@ -1,18 +1,22 @@
+
 ################################################################
-# Stage 1: Build ArangoDB and install to /opt/arangodb-dist
+# Stage 1: Build ArangoDB, apply patches, и собрать deb-пакет
 ################################################################
 ARG TAG=v3.11.14
 FROM debian:12 AS builder
 ARG TAG
 
-# 1. Устанавливаем зависимости
+# 1. Устанавливаем зависимости для сборки и упаковки
 RUN apt-get update && apt-get install --no-install-recommends -y \
   build-essential cmake \
   clang-16 lld-16 llvm-16 libomp-16-dev \
   libopenblas-dev libssl-dev \
   python3 python3-clang-16 libabsl-dev \
-  git-core wget unzip tar nodejs npm && \
-  npm install -g yarn && apt-get clean -y
+  git-core wget unzip tar nodejs npm ruby ruby-dev rubygems \
+  rpm dpkg-dev && \
+  npm install -g yarn && \
+  gem install --no-document fpm && \
+  apt-get clean -y
 
 # 2. Клонируем ArangoDB
 RUN git clone --branch ${TAG} --depth 1 --recurse-submodules \
@@ -26,7 +30,7 @@ RUN cd /opt/arangodb/src && \
     git apply -p1 --ignore-space-change --ignore-whitespace "$p"; \
   done
 
-# 4. Сборка с DESTDIR
+# 4. Сборка и упаковка в deb-пакет
 RUN mkdir /opt/arangodb/build && cd /opt/arangodb/build && \
   cmake /opt/arangodb/src \
     -DCMAKE_C_COMPILER=/usr/bin/clang-16 \
@@ -39,51 +43,54 @@ RUN mkdir /opt/arangodb/build && cd /opt/arangodb/build && \
     -DUSE_JEMALLOC=Off \
     -DCMAKE_C_FLAGS='-w -std=c11 -fopenmp' \
     -DCMAKE_CXX_FLAGS='-w -std=c++17 -fopenmp' && \
-  make -j$(nproc) install DESTDIR=/opt/arangodb-dist
-
+  make -j$(nproc) install DESTDIR=/opt/arangodb-dist && \
+  fpm -s dir -t deb -n arangodb3-custom -v ${TAG} -a amd64 -C /opt/arangodb-dist \
+    --deb-no-default-config-files \
+    --description "Custom ArangoDB build with patches" \
+    --maintainer "Qubership <bot@qubership.com>" \
+    --url "https://arangodb.com" \
+    --license "Apache-2.0" \
+    --deb-priority optional \
+    --deb-user root --deb-group root \
+    usr && \
+  mv arangodb3-custom_${TAG}_*.deb arangodb3-custom_${TAG}_amd64.deb
 ################################################################
-# Stage 2: Debian runtime
+# Stage 2: Alpine runtime (как у официалалов)
 ################################################################
-FROM debian:12-slim
+FROM alpine:3.21
 LABEL maintainer="Qubership <bot@qubership.com>"
 
 ARG TAG
 ENV ARANGO_VERSION=${TAG}
 ENV PATH="/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:$PATH"
 
-# 1. Устанавливаем рантайм-зависимости
-RUN apt-get update && apt-get install --no-install-recommends -y \
-  bash gnupg pwgen binutils numactl libssl3 libatomic1 libomp5 nodejs npm && \
-  npm install -g yarn && \
-  yarn global add foxx-cli && \
-  apt-get clean && rm -rf /var/lib/apt/lists/**
+# 1. Устанавливаем зависимости и glibc-compat
+RUN apk add --no-cache gnupg pwgen binutils numactl numactl-tools nodejs yarn curl && \
+    apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/community/ gcompat
 
+# 2. Копируем deb-пакет и распаковываем его
+COPY --from=builder /opt/arangodb/build/arangodb3-custom_${TAG}_amd64.deb /tmp/
+RUN cd /tmp && \
+    ar x arangodb3-custom_${TAG}_amd64.deb data.tar.gz && \
+    tar -C / -xzf data.tar.gz && \
+    rm -f arangodb3-custom_${TAG}_amd64.deb data.tar.gz
 
-# 2. Создаём пользователя и группу arangodb
-RUN groupadd --system arangodb && \
-    useradd --system --gid arangodb --home-dir /var/lib/arangodb3 --shell /bin/false arangodb
-
-# 3. Копируем установленные бинарники
-COPY --from=builder /opt/arangodb-dist/usr /usr
-
-# 4. Обеспечиваем наличие симлинков и конфигурации
+# 3. Настраиваем окружение и права
 RUN mkdir -p /etc/arangodb3 && \
     ln -sf /usr/etc/arangodb3/arangod.conf /etc/arangodb3/arangod.conf && \
-    ln -sf /usr/sbin/arangod /usr/bin/arangod
-
-# 4. Права и тома
-RUN mkdir -p /var/lib/arangodb3 /var/lib/arangodb3-apps /var/log/arangodb3 && \
+    ln -sf /usr/sbin/arangod /usr/bin/arangod && \
+    mkdir -p /var/lib/arangodb3 /var/lib/arangodb3-apps /var/log/arangodb3 && \
     chgrp -R 0 /var/lib/arangodb3 /var/lib/arangodb3-apps /var/log/arangodb3 && \
     chmod -R 775 /var/lib/arangodb3 /var/lib/arangodb3-apps /var/log/arangodb3 && \
     echo "UTC" > /etc/timezone
 
 VOLUME ["/var/lib/arangodb3", "/var/lib/arangodb3-apps"]
 
-# 5. Entrypoint
+# 4. Entrypoint
 COPY docker-entrypoint.sh /entrypoint.sh
 COPY docker-foxx.sh       /usr/bin/foxx
 RUN chmod +x /entrypoint.sh /usr/bin/foxx
 
 EXPOSE 8529
-ENTRYPOINT ["bash", "/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["arangod"]
