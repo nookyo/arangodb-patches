@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 if [ -z "$ARANGO_INIT_PORT" ] ; then
@@ -7,6 +7,15 @@ fi
 
 AUTHENTICATION="true"
 
+export PATH=${PATH}:/usr/sbin/:/usr/bin/
+
+
+#if ! whoami &> /dev/null; then
+if [ -w /etc/passwd ]; then
+  echo "${USER_NAME:-arangodb}:x:$(id -u):0:${USER_NAME:-arangodb} user:${ROOT_DIR}:/sbin/nologin" >> /etc/passwd
+fi
+#fi
+ 
 # if command starts with an option, prepend arangod
 case "$1" in
     -*) set -- arangod "$@" ;;
@@ -40,6 +49,20 @@ if [ "$1" = 'arangod' ]; then
     # Make a copy of the configuration file to patch it, note that this
     # must work regardless under which user we run:
     cp /etc/arangodb3/arangod.conf /tmp/arangod.conf
+    
+    sed 's|uid = arangodb|# uid = arangodb|' -i /tmp/arangod.conf
+    # echo "[server]" >> /tmp/arangod.conf
+    # echo "uid = arangodb" >> /tmp/arangod.conf
+    
+    echo "[log]" >> /tmp/arangod.conf
+    echo "file = -" >> /tmp/arangod.conf
+    
+#    echo "[database]" >> /tmp/arangod.conf
+#    echo "directory = /var/lib/arangodb3" >> /tmp/arangod.conf
+    
+#    echo "[javascript]" >> /tmp/arangod.conf
+#    echo "startup-directory = /usr/share/arangodb3/js" >> /tmp/arangod.conf
+#    echo "app-path = /var/lib/arangodb3-apps" >> /tmp/arangod.conf
 
     ARANGO_STORAGE_ENGINE=rocksdb
     if [ ! -z "$ARANGO_ENCRYPTION_KEYFILE" ]; then
@@ -88,8 +111,8 @@ if [ "$1" = 'arangod' ]; then
         $NUMACTL arangod --config /tmp/arangod.conf \
                 --server.endpoint tcp://127.0.0.1:$ARANGO_INIT_PORT \
                 --server.authentication false \
-		--log.file /tmp/init-log \
-		--log.foreground-tty false &
+                --log.file /tmp/init-log \
+                --log.foreground-tty false &
         pid="$!"
 
         counter=0
@@ -105,22 +128,18 @@ if [ "$1" = 'arangod' ]; then
                 cat /tmp/init-log
                 exit 1
             fi
+            
+            counter=$((counter+1))
 
-            let counter=counter+1
             ARANGO_UP=1
 
             $NUMACTL arangosh \
+                --config /tmp/arangod.conf \
                 --server.endpoint=tcp://127.0.0.1:$ARANGO_INIT_PORT \
                 --server.authentication false \
                 --javascript.execute-string "db._version()" \
                 > /dev/null 2>&1 || ARANGO_UP=0
         done
-
-        if [ "$(id -u)" = "0" ] ; then
-            foxx server set default http://127.0.0.1:$ARANGO_INIT_PORT
-        else
-            echo Not setting foxx server default because we are not root.
-        fi
 
         for f in /docker-entrypoint-initdb.d/*; do
             case "$f" in
@@ -131,6 +150,7 @@ if [ "$1" = 'arangod' ]; then
             *.js)
                 echo "$0: running $f"
                 $NUMACTL arangosh ${ARANGOSH_ARGS} \
+                        --config /etc/arangodb3/arangosh.conf \
                         --server.endpoint=tcp://127.0.0.1:$ARANGO_INIT_PORT \
                         --javascript.execute "$f"
                 ;;
@@ -152,10 +172,6 @@ if [ "$1" = 'arangod' ]; then
             esac
         done
 
-        if [ "$(id -u)" = "0" ] ; then
-            foxx server remove default
-        fi
-
         if ! kill -s TERM "$pid" || ! wait "$pid"; then
             echo >&2 'ArangoDB Init failed.'
             exit 1
@@ -172,6 +188,8 @@ if [ "$1" = 'arangod' ]; then
     if [ ! -z "$ARANGO_NO_AUTH" ]; then
 	    AUTHENTICATION="false"
     fi
+    
+    echo "params: $@"
 
     set -- arangod "$@" --server.authentication="$AUTHENTICATION" --config /tmp/arangod.conf
 else
